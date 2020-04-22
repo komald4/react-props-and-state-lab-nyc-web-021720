@@ -15,6 +15,38 @@ class App extends React.Component {
     }
   }
 
+  onChangeType = (event) => {
+    // console.log(event)
+    let newType = event.target.value
+    this.setState(prevState => {
+      let filters = Object.assign({}, prevState.filters);  // creating copy of state variable jasper
+      filters.type = newType;                            // update the name property, assign a new value                 
+      return { filters };                                 // return new object jasper object
+    })
+  console.log(this.state.pets)} 
+
+
+  onAdoptPet = (id) => {
+    const adoptedPet = this.state.pets.filter(pet => pet.id === id)[0]
+      adoptedPet.isAdopted = true
+  }
+
+  fetchPets = () => {
+    if (this.state.filters.type === 'all') {
+      fetch('/api/pets')
+    .then(res => res.json())
+    .then(data => {
+        this.setState({ pets: data })
+    }) 
+    } else {
+      fetch(`/api/pets?type=${this.state.filters.type}`)
+      .then(res => res.json())
+      .then(data => {
+          this.setState({ pets: data })
+    })
+  }
+}
+
   render() {
     return (
       <div className="ui container">
@@ -24,10 +56,10 @@ class App extends React.Component {
         <div className="ui container">
           <div className="ui grid">
             <div className="four wide column">
-              <Filters />
+              <Filters onChangeType = {this.onChangeType} fetchPets={this.fetchPets}/>
             </div>
             <div className="twelve wide column">
-              <PetBrowser />
+              <PetBrowser pets={this.state.pets} adopted={this.onAdoptPet}/>
             </div>
           </div>
         </div>
@@ -35,5 +67,6 @@ class App extends React.Component {
     )
   }
 }
+
 
 export default App
